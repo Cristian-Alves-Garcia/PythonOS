@@ -1,48 +1,60 @@
 import tkinter as tk
-import os
+from tkinter import filedialog
+from PIL import Image, ImageTk
 
 root = tk.Tk()
-root.title("Gerenciador de Arquivos")
-root.geometry("600x400")
+root.title("Abridor de Imagem Simples")
+root.geometry("600x500")
 
-# TÍTULO VISÍVEL
+# TÍTULO
 titulo = tk.Label(
     root,
-    text="GERENCIADOR DE ARQUIVOS (DEBUG)",
+    text="ABRIDOR DE IMAGEM (SIMPLÃO)",
     font=("Arial", 14, "bold")
 )
 titulo.pack(pady=5)
 
-# CAMINHO ATUAL
-caminho = os.getcwd()
+# LABEL DA IMAGEM
+img_label = tk.Label(root, text="Nenhuma imagem carregada")
+img_label.pack(expand=True)
 
-path_label = tk.Label(
-    root,
-    text=f"Pasta atual:\n{caminho}",
-    font=("Arial", 9)
-)
-path_label.pack(pady=5)
+# referência global (IMPORTANTE no Tkinter)
+img_tk = None
 
-# LISTA CRUA
-lista = tk.Listbox(root, font=("Courier", 10))
-lista.pack(expand=True, fill="both", padx=10, pady=10)
+def abrir_imagem():
+    global img_tk
 
-# POPULA MANUALMENTE
-lista.insert(tk.END, "=== CONTEÚDO DA PASTA ===")
+    arquivo = filedialog.askopenfilename(
+        title="Escolha uma imagem",
+        filetypes=[
+            ("Imagens", "*.png *.jpg *.jpeg *.bmp *.gif"),
+            ("Todos os arquivos", "*.*")
+        ]
+    )
 
-try:
-    for item in os.listdir(caminho):
-        if os.path.isdir(item):
-            lista.insert(tk.END, f"[DIR]  {item}")
-        else:
-            lista.insert(tk.END, f"       {item}")
-except Exception as e:
-    lista.insert(tk.END, f"ERRO: {e}")
+    if not arquivo:
+        return
 
-# TEXTO DE DEBUG
+    # abre imagem
+    img = Image.open(arquivo)
+
+    # redimensiona para caber
+    largura_max = 550
+    altura_max = 400
+    img.thumbnail((largura_max, altura_max))
+
+    img_tk = ImageTk.PhotoImage(img)
+
+    img_label.config(image=img_tk, text="")
+
+# BOTÃO
+btn = tk.Button(root, text="Abrir Imagem", command=abrir_imagem)
+btn.pack(pady=5)
+
+# RODAPÉ
 rodape = tk.Label(
     root,
-    text="o codigo está terrivel volto concertar otra hora perdi a paciencia.",
+    text="correção de erros outra hora.",
     font=("Arial", 8)
 )
 rodape.pack(pady=5)
